@@ -45,6 +45,7 @@ function aggregateSalesData() {
   const folder = DriveApp.getFolderById(folderId);
   const files = folder.getFiles();
   const summaryData = [];
+  let hasMatch = false;
 
   while (files.hasNext()) {
     const file = files.next();
@@ -64,6 +65,7 @@ function aggregateSalesData() {
       
       const values = sheet.getRange(2, 1, lastRow - 1, 5).getValues(); // A列(1)からE列(5)まで取得
       let totalAmount = 0;
+      let storeHasMatch = false;
       
       for (let i = 0; i < values.length; i++) {
         const row = values[i];
@@ -81,13 +83,17 @@ function aggregateSalesData() {
         
         // 年月が一致するか確認
         if (date.getFullYear() === targetYear && (date.getMonth() + 1) === targetMonth) {
+          hasMatch = true;
+          storeHasMatch = true;
           if (!isNaN(amount)) {
             totalAmount += Number(amount);
           }
         }
       }
       
-      summaryData.push([storeName, totalAmount]);
+      if (storeHasMatch) {
+        summaryData.push([storeName, totalAmount]);
+      }
     }
   }
 
@@ -97,6 +103,12 @@ function aggregateSalesData() {
   
   outputSheet.clear(); // シートのクリア
   
+  if (!hasMatch) {
+    outputSheet.getRange(1, 1).setValue('集計対象がありません');
+    Browser.msgBox('対象期間のデータが見つかりませんでした。');
+    return;
+  }
+
   // ヘッダーの書き込み
   const outputValues = [['店舗名', '金額'], ...summaryData];
   
