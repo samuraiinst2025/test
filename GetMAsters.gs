@@ -20,6 +20,7 @@
 * - 個別更新もできる（syncCompanies / syncAccountItems / syncSections / syncPartners）
 */
 
+
 /* =========================
 * まとめ実行（メニューから呼ぶ）
 * ========================= */
